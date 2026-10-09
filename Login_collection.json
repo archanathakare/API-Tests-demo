@@ -1,0 +1,299 @@
+{
+  "info": {
+    "_postman_id": "d1e52fff-06fc-4431-85f2-919fa62d8769",
+    "name": "Login_Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58179215",
+    "_collection_link": "https://go.postman.co/collection/58179215-d1e52fff-06fc-4431-85f2-919fa62d8769?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Positive Scenario",
+      "item": [
+        {
+          "name": "Positive Login Dummy JSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseData = pm.response.json();",
+                  "pm.collectionVariables.set(\"accessToken\", responseData.accessToken);",
+                  "",
+                  "pm.test(\"Validate Staus Code\", ()=>{",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+                  "});",
+                  "",
+                  "pm.test(\"Validate Respose Time\", ()=>{",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Validate Username & fields\", ()=>{",
+                  "    pm.expect(pm.response.json().username).to.eql(\"emilys\");",
+                  "    pm.expect(pm.response.json().email).to.be.an(\"String\");",
+                  "});",
+                  "",
+                  "pm.test(\"Validate Access Token\", ()=>{",
+                  "    pm.expect(responseData.accessToken).to.be.a(\"String\").and.not.empty;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"emilys\",\r\n  \"password\": \"emilyspass\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Stage_URL}}auth/login",
+              "host": [
+                "{{Stage_URL}}auth"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auth Me with Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than 500ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Validate given respose is object\", function(){\r",
+                  "    pm.expect(pm.response.json()).to.be.an('object');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Validate Password is not expose\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.have.property(\"Password\")\r",
+                  "});\r",
+                  "\r",
+                  "pm.collectionVariables.unset(\"accessToken\");\r",
+                  "\r",
+                  "// Clear all cookies for a domain (need to get each first, since there's no bulk clear)\r",
+                  "pm.cookies.jar().getAll(\"example.com\", (err, cookies) => {\r",
+                  "    cookies.forEach(cookie => {\r",
+                  "        pm.cookies.jar().unset(\"example.com\", cookie.name);\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Stage_URL}}auth/me",
+              "host": [
+                "{{Stage_URL}}auth"
+              ],
+              "path": [
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative Scenario",
+      "item": [
+        {
+          "name": "Wrong Login Dummy JSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const expectedStatus = pm.iterationData.get(\"status_code\");\r",
+                  "const expectedMessage = pm.iterationData.get(\"message\");\r",
+                  "const responseData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Validate status code\", function () {\r",
+                  "    pm.response.to.have.status(expectedStatus);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Validate response message\", function () {\r",
+                  "    pm.expect(responseData.message).to.eql(expectedMessage);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Validate Access token is not present in response\", function () {\r",
+                  "    pm.expect(responseData.accessToken).to.be.undefined;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Stage_URL}}auth/login",
+              "host": [
+                "{{Stage_URL}}auth"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auth Me without Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Validate Error Message\", function(){\r",
+                  "    pm.expect(pm.response.json().message).to.eql(\"Access Token is required\")\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.cookies.jar().getAll(pm.request.url, function (err, cookies) {",
+                  "    console.log(\"Cookies in jar:\", cookies ? cookies.map(c => c.name) : []);",
+                  "});",
+                  "console.log(\"Auth:\", JSON.stringify(pm.request.auth));",
+                  "console.log(\"Headers:\", JSON.stringify(pm.request.headers.toObject(), null, 2));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{Stage_URL}}auth/me",
+              "host": [
+                "{{Stage_URL}}auth"
+              ],
+              "path": [
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ]
+}

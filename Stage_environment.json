@@ -1,0 +1,16 @@
+{
+	"id": "0a6885ed-0879-4700-836e-519e060b6078",
+	"name": "Stage Environment",
+	"values": [
+		{
+			"key": "Stage_URL",
+			"value": "https://dummyjson.com/",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"color": null,
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2026-10-02T18:51:20.665Z",
+	"_postman_exported_using": "Postman/12.30.5"
+}

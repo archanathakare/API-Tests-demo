@@ -1,0 +1,5 @@
+username,password,status_code,message
+emilys,emilyspass12323445,400,Invalid credentials
+1234emilys,emilyspass,400,Invalid credentials
+emilys,,400,Username and password required
+,emilyspass,400,Username and password required
